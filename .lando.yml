@@ -1,0 +1,58 @@
+name: ipoop
+recipe: laravel
+
+config:
+  webroot: public
+  php: '8.2'
+  xdebug: true
+  composer_version: 2-latest
+  via: apache:2.4
+  database: mysql:5.7
+  cache: redis
+
+services:
+  appserver:
+    config:
+      php: .vscode/php.ini
+
+    build_as_root:
+      - /app/scripts/build.sh
+
+    run:
+      - /app/scripts/run.sh
+  
+  node:
+    type: node:18
+    build:
+      - npm install
+    
+tooling:
+  composer:
+    service: appserver
+
+  artisan:
+    service: appserver
+
+  mysql:
+    service: database
+  
+  npm:
+    service: node
+    description: Run npm commands
+    cmd:
+      - npm
+  
+  npx:
+    service: node
+    description: Run npx commands
+    cmd:
+      - npx
+  
+build:
+  - composer install
+  - npm install
+  - npm run dev
+
+proxy:
+  appserver:
+    - ipoop.lando.site
