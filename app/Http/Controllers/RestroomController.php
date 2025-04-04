@@ -22,7 +22,7 @@ class RestroomController extends Controller
             'accessible' => 'boolean',
             'latitude' => 'required|numeric',
             'longitude' => 'required|numeric',
-            'cost' => 'nullable|numeric',
+            'cost' => 'required|numeric|min:0',
         ]);
 
         $validated['user_id'] = Auth::id();
