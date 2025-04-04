@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="64" viewBox="0 0 48 64">
+  <!-- Forma de gota -->
+  <path d="M24 0C11 0 0 11 0 24c0 13.25 24 40 24 40s24-26.75 24-40C48 11 37 0 24 0z" fill="#007BFF"/>
+  <!-- Símbolo de banheiro (🏛️) -->
+  <text x="24" y="32" font-size="18" text-anchor="middle" dominant-baseline="middle" fill="#fff">🏛️</text>
+  <!-- Estrelas (4 de 5) -->
+  <text x="24" y="58" font-size="12" text-anchor="middle" fill="#FFD700">★★★★☆</text>
+</svg>

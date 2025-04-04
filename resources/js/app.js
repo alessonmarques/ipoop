@@ -6,8 +6,8 @@ import IPoopMap from './ipoop-map';
 window.Alpine = Alpine;
 Alpine.start();
 
+window.iPoop = window.iPoop || {};
+
 document.addEventListener("DOMContentLoaded", () => {
-    if (document.getElementById('map')) {
-      IPoopMap.initMap();
-    }
-  });
+  window.iPoop.map = IPoopMap;
+});

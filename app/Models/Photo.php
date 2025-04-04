@@ -11,7 +11,8 @@ class Photo extends Model
 
     protected $fillable = [
         'restroom_id',
-        'path'
+        'path',
+        'caption',
     ];
 
     public function restroom()

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 64 64">
+  <!-- Forma de pin -->
+  <path d="M32 2C20 2 12 11 12 22c0 11 20 38 20 38s20-27 20-38C52 11 44 2 32 2z" fill="rgb(147, 51, 234)"/>
+  <!-- Emoji 💩 estilizado com formas vetoriais -->
+  <path d="M32 18c-4-2-2-6 0-8-6 0-9 4-9 7-6 2-7 10-2 12-3 2-3 8 1 10h20c4-2 4-8 1-10 5-2 4-10-2-12-1 1-4 1-9 1z" fill="#fff"/>
+  <circle cx="26" cy="30" r="2" fill="#000"/>
+  <circle cx="38" cy="30" r="2" fill="#000"/>
+  <path d="M28 36c2 2 6 2 8 0" stroke="#000" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+</svg>

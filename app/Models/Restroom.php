@@ -16,6 +16,7 @@ class Restroom extends Model
         'accessible',
         'latitude',
         'longitude',
+        'cost',
         'user_id'
     ];
 
