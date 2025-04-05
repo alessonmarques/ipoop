@@ -38,8 +38,8 @@ Route::middleware(['auth', 'checkUserType:admin'])
         Route::delete('/restrooms/{restroom}', [AdminRestroomController::class, 'destroy'])->name('restrooms.destroy');
 
         // Report routes
-        Route::get('/reports', [AdminReportController::class, 'index'])->name('admin.reports.index');
-
+        Route::get('/reports', [AdminReportController::class, 'index'])->name('reports.index');
+        Route::post('/admin/reports/{report}/resolve', [AdminReportController::class, 'resolve'])->name('reports.resolve');
     });
 
 require __DIR__.'/auth.php';

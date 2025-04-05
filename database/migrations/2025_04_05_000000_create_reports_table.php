@@ -10,6 +10,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('restroom_id')->constrained()->onDelete('cascade');
+            $table->boolean('resolved')->default(false);
             $table->text('reason')->nullable();
             $table->timestamps();
         });
