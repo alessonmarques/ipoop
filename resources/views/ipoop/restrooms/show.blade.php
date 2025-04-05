@@ -6,7 +6,10 @@
   </x-slot>
 
   <div class="px-4 py-6 max-w-4xl mx-auto space-y-4">
-    <a href="{{ route('admin.restrooms.index') }}" class="text-purple-600 hover:underline">← Voltar</a>
+    <div class="flex justify-between items-center">
+        <a href="{{ route('admin.restrooms.index') }}" class="text-purple-600 hover:underline">← Voltar</a>
+        <x-report-button :restroom="$restroom" />
+    </div>
 
     <div class="mt-6 flex flex-col lg:flex-row gap-6 items-start">
         <!-- Informações -->
@@ -15,7 +18,7 @@
             <p><strong>Tipo:</strong> {{ ucfirst($restroom->type) }}</p>
             <p><strong>Acessível:</strong> {{ $restroom->accessible ? 'Sim' : 'Não' }}</p>
             <p><strong>Custo:</strong> R$ {{ number_format($restroom->cost, 2, ',', '.') }}</p>
-            <p><strong>Descrição:</strong> {{ $restroom->description }}</p>
+            <p><strong>Descrição:</strong> {{ Str::limit($restroom->description, 500) }}</p>
         </div>
 
         <!-- Galeria -->

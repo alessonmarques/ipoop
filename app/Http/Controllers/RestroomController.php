@@ -25,7 +25,7 @@ class RestroomController extends Controller
             // Validate the request data
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
-                'description' => 'nullable|string',
+                'description' => 'nullable|string|max:500',
                 'type' => 'required|in:public,private',
                 'accessible' => 'nullable|boolean',
                 'cost' => 'required|numeric|min:0',

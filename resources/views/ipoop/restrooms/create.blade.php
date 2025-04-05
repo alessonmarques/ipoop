@@ -31,7 +31,7 @@
       </div>
       <div class="mb-4">
         <label class="block font-medium">Descrição</label>
-        <textarea name="description" class="w-full border rounded px-3 py-2">{{ old('description') }}</textarea>
+        <textarea name="description" class="w-full border rounded px-3 py-2" maxlength="500">{{ old('description') }}</textarea>
       </div>
       <div class="mb-4">
         <label class="block font-medium">Custo de uso (R$)</label>
