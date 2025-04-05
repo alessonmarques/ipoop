@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminRestroomController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RestroomController;
+use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -14,11 +15,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
     // Restroom routes
     Route::get('/restrooms/create', [RestroomController::class, 'create'])->name('restrooms.create');
     Route::post('/restrooms', [RestroomController::class, 'store'])->name('restrooms.store');
+    Route::get('/restrooms/{restroom}', [RestroomController::class, 'show'])->name('restrooms.show');
+    Route::post('/restrooms/{restroom}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 });
-
 
 Route::middleware(['auth', 'checkUserType:admin'])
     ->prefix('admin')
@@ -27,8 +30,6 @@ Route::middleware(['auth', 'checkUserType:admin'])
         Route::get('/restrooms', [AdminRestroomController::class, 'index'])->name('restrooms.index');
         Route::post('/restrooms/{restroom}/approve', [AdminRestroomController::class, 'approve'])->name('restrooms.approve');
         Route::delete('/restrooms/{restroom}', [AdminRestroomController::class, 'destroy'])->name('restrooms.destroy');
-
-        Route::get('/restrooms/{restroom}', [AdminRestroomController::class, 'show'])->name('restrooms.show');
     });
 
 require __DIR__.'/auth.php';

@@ -20,11 +20,6 @@ class AdminRestroomController extends Controller
         return view('ipoop.admin.restrooms.index', compact('restrooms'));
     }
 
-    public function show(Restroom $restroom)
-    {
-        return view('ipoop.admin.restrooms.show', compact('restroom'));
-    }
-
     public function approve(Restroom $restroom)
     {
         $restroom->approved = true;

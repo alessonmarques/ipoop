@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Photo;
 use App\Models\Restroom;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,6 +12,11 @@ class RestroomController extends Controller
     public function create()
     {
         return view('ipoop.restrooms.create');
+    }
+
+    public function show(Restroom $restroom)
+    {
+        return view('ipoop.restrooms.show', compact('restroom'));
     }
 
     public function store(Request $request)
@@ -45,7 +51,19 @@ class RestroomController extends Controller
             $validated['approved'] = false;
 
             // Create a new restroom
-            Restroom::create($validated);
+            $restroom = Restroom::create($validated);
+
+            // Handle the photos
+            if ($request->hasFile('photos')) {
+                foreach ($request->file('photos') as $photo) {
+                    $path = $photo->store('photos', 'public');
+                    Photo::create([
+                        'restroom_id' => $restroom->id,
+                        'path' => $path,
+                    ]);
+                }
+            }
+
             return redirect()->route('home')->with('success', 'Banheiro enviado para revisão.');
         } catch (\Exception $e) {
             return back()->withErrors(['error' => $e->getMessage()])->withInput();

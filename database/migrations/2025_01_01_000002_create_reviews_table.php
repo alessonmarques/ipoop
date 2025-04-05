@@ -10,9 +10,11 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('restroom_id')->constrained()->onDelete('cascade');
-            $table->tinyInteger('rating'); // nota de 1 a 5
+            $table->tinyInteger('rating')->unsigned();
             $table->text('comment')->nullable();
             $table->timestamps();
+
+            $table->unique(['user_id', 'restroom_id']);
         });
     }
 

@@ -65,7 +65,7 @@
                 </button>
               </form>
 
-              <a  href="{{ route('admin.restrooms.show', $restroom) }}"
+              <a href="{{ route('restrooms.show', $restroom) }}"
                   class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-md shadow-md transition focus:outline-none focus:ring-2 focus:ring-blue-400 opacity-100">
                 Visualizar
               </a>

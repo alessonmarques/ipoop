@@ -13,7 +13,7 @@ class Review extends Model
         'user_id',
         'restroom_id',
         'rating',
-        'comment'
+        'comment',
     ];
 
     public function user()

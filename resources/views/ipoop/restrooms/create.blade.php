@@ -11,7 +11,7 @@
     </a>
   </div>
   <div class="py-6 px-4 max-w-4xl mx-auto">
-    <form action="{{ route('restrooms.store') }}" method="POST">
+    <form action="{{ route('restrooms.store') }}" enctype="multipart/form-data" method="POST">
       @csrf
       <div class="mb-4">
         <label class="block font-medium">Nome</label>
@@ -36,6 +36,10 @@
       <div class="mb-4">
         <label class="block font-medium">Custo de uso (R$)</label>
         <input type="number" step="0.01" min="0" name="cost" value="{{ old('cost') }}" id="cost" class="w-full border rounded px-3 py-2" required>
+      </div>
+      <div class="mb-4">
+        <label class="block font-medium">Fotos (até 5 imagens)</label>
+        <input type="file" name="photos[]" multiple accept="image/*" value="{{ old('cost') }}" class="w-full border rounded px-3 py-2">
       </div>
       <div class="mb-4">
         <label class="block font-medium">Localização</label>
