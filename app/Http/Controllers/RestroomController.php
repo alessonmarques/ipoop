@@ -15,21 +15,40 @@ class RestroomController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'type' => 'required|in:public,private',
-            'accessible' => 'boolean',
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
-            'cost' => 'required|numeric|min:0',
-        ]);
+        try {
+            // Validate the request data
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'type' => 'required|in:public,private',
+                'accessible' => 'nullable|boolean',
+                'cost' => 'required|numeric|min:0',
+            ]);
 
-        $validated['user_id'] = Auth::id();
-        $validated['approved'] = false;
+            // Validate the latitude and longitude
+            if (!$request->get('latitude') || !$request->get('longitude')) {
+                return back()->withErrors(['error' => 'Localização não informada.'])->withInput();
+            }
+            $request->validate([
+                'latitude' => 'required|numeric|between:-90,90',
+                'longitude' => 'required|numeric|between:-180,180',
+            ]);
 
-        Restroom::create($validated);
+            // Validate latitude and longitude
+            $validated['latitude'] = $request->input('latitude');
+            $validated['longitude'] = $request->input('longitude');
 
-        return redirect()->route('home')->with('success', 'Banheiro enviado para revisão.');
+            // Check if the restroom is accessible
+            $validated['accessible'] = in_array($request->input('accessible'), ['on', '1', 1, true], true) ? true : false;
+
+            $validated['user_id'] = Auth::id();
+            $validated['approved'] = false;
+
+            // Create a new restroom
+            Restroom::create($validated);
+            return redirect()->route('home')->with('success', 'Banheiro enviado para revisão.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => $e->getMessage()])->withInput();
+        }
     }
 }

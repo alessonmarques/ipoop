@@ -34,6 +34,9 @@
                 </header>
             @endisset
 
+            <!-- Alerts -->
+            <x-alerts />
+
             <!-- Page Content -->
             @isset($slot)
                 <main>

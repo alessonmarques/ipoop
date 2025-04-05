@@ -15,33 +15,33 @@
       @csrf
       <div class="mb-4">
         <label class="block font-medium">Nome</label>
-        <input type="text" name="name" class="w-full border rounded px-3 py-2" required>
+        <input type="text" name="name" value="{{ old('name') }}" class="w-full border rounded px-3 py-2" required>
       </div>
       <div class="mb-4">
         <label class="block font-medium">Tipo</label>
         <select name="type" class="w-full border rounded px-3 py-2" required>
-          <option value="public">Público</option>
-          <option value="private">Privado</option>
+          <option value="public" {{ old('type') === 'public' ? 'selected' : '' }}>Público</option>
+          <option value="private" {{ old('type') === 'private' ? 'selected' : '' }}>Privado</option>
         </select>
       </div>
       <div class="mb-4">
         <label class="inline-flex items-center">
-          <input type="checkbox" name="accessible" class="mr-2"> Acessível
+          <input type="checkbox" name="accessible" value="{{ old('accessible') }}" class="mr-2"> Acessível
         </label>
       </div>
       <div class="mb-4">
         <label class="block font-medium">Descrição</label>
-        <textarea name="description" class="w-full border rounded px-3 py-2"></textarea>
+        <textarea name="description" class="w-full border rounded px-3 py-2">{{ old('description') }}</textarea>
       </div>
       <div class="mb-4">
         <label class="block font-medium">Custo de uso (R$)</label>
-        <input type="number" step="0.01" min="0" name="cost" id="cost" class="w-full border rounded px-3 py-2" required>
+        <input type="number" step="0.01" min="0" name="cost" value="{{ old('cost') }}" id="cost" class="w-full border rounded px-3 py-2" required>
       </div>
       <div class="mb-4">
         <label class="block font-medium">Localização</label>
         <div id="map" class="w-full h-64 rounded border"></div>
-        <input type="hidden" name="latitude" id="lat">
-        <input type="hidden" name="longitude" id="lng">
+        <input type="hidden" name="latitude" value="{{ old('latitude') }}" id="lat">
+        <input type="hidden" name="longitude" value="{{ old('longitude') }}" id="lng">
       </div>
       <div class="text-right">
         <a href="{{ route('home') }}"

@@ -20,12 +20,12 @@ services:
 
     run:
       - /app/scripts/run.sh
-  
+
   node:
     type: node:18
     build:
       - npm install
-    
+
 tooling:
   composer:
     service: appserver
@@ -35,19 +35,30 @@ tooling:
 
   mysql:
     service: database
-  
+
+  cr:
+    service: appserver
+    description: "Clearing cache"
+    cmd: |
+      php artisan route:clear &&
+      php artisan config:clear &&
+      php artisan view:clear &&
+      php artisan cache:clear &&
+      php artisan optimize:clear
+
+
   npm:
     service: node
     description: Run npm commands
     cmd:
       - npm
-  
+
   npx:
     service: node
     description: Run npx commands
     cmd:
       - npx
-  
+
 build:
   - composer install
   - npm install
