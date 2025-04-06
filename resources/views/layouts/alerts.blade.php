@@ -11,7 +11,7 @@
         </div>
     @endif
 
-    @if ($errors->any())
+    @if (isset($errors) && $errors->any())
         <div class="relative p-4 pr-10 bg-red-100 text-red-800 border border-red-300 rounded-lg shadow-lg text-sm font-medium">
             <ul class="list-disc list-inside text-left pr-6">
                 @foreach ($errors->all() as $error)

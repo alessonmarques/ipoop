@@ -139,7 +139,7 @@ const IPoopMap = {
         const newLng = position.coords.longitude;
 
         const distanceMoved = this._calculateDistance(this.lastPosition.lat, this.lastPosition.lng, newLat, newLng);
-        if (distanceMoved > 0.1) {
+        if (distanceMoved > 0.01) {
           this.lastPosition = { lat: newLat, lng: newLng };
           this.userMarker.setLatLng([newLat, newLng]);
           this.fetchNearbyRestrooms(newLat, newLng);

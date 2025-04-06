@@ -3,9 +3,11 @@
     @foreach ($testimonials as $review)
       <div class="bg-white rounded shadow p-4 flex flex-col justify-between w-full sm:w-[48%] md:w-[30%] max-w-[400px]">
         <div>
-          <div class="text-gray-600 text-sm mb-2 italic">
-            “{{ $review->comment }}”
-          </div>
+            @if ($review->comment)
+                <div class="text-gray-600 text-sm mb-2 italic">
+                    “{{ $review->comment }}”
+                </div>
+            @endif
           <div class="text-yellow-500 mb-2">
             @for ($i = 1; $i <= 5; $i++)
               @if ($i <= $review->rating)

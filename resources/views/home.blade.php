@@ -3,7 +3,7 @@
     <div class="flex flex-col h-[90vh] relative" style="z-index: 1;">
         <a href="{{ auth()->check() ? '/restrooms/create' : '#' }}"
             id="addRestroomBtn"
-            class="absolute bottom-6 right-6 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-5 rounded shadow-lg z-[10000]">
+            class="absolute bottom-12 right-6 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-5 rounded shadow-lg z-[10000]">
             + Adicionar Banheiro
         </a>
 
@@ -41,7 +41,7 @@
             </div>
         </div>
 
-        <div class="mt-12 text-left space-y-8">
+        <div class="mt-12 text-center space-y-10">
             <h3 class="text-xl font-semibold text-purple-700">Como funciona o iPoop?</h3>
             <ol class="list-decimal list-inside text-gray-700 text-base space-y-1">
                 <li>Encontre banheiros públicos e privados próximos.</li>
