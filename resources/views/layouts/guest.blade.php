@@ -25,8 +25,17 @@
                     </a>
                 </div>
 
-                <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
-                    {{ $slot }}
+
+                <div class="w-full sm:max-w-md">
+                    <div class="my-4">
+                        <a href="{{ route('home') }}" class="inline-flex items-center text-sm font-medium text-purple-600 hover:text-purple-800">
+                            ← Voltar
+                        </a>
+                    </div>
+
+                    <div class="mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
+                        {{ $slot }}
+                    </div>
                 </div>
             </div>
         </div>

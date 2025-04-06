@@ -7,6 +7,12 @@
 
   <div class="px-4 py-6 max-w-7xl mx-auto">
 
+    <div class="mb-4">
+        <a href="{{ route('profile') }}" class="inline-flex items-center text-sm font-medium text-purple-600 hover:text-purple-800">
+            ← Voltar
+        </a>
+    </div>
+
     <div class="mb-4 flex gap-4">
       <a href="{{ route('admin.reports.index') }}"
          class="px-4 py-2 rounded {{ request()->has('resolved') ? 'bg-gray-100 text-gray-700' : 'bg-purple-600 text-white font-semibold shadow' }}">
