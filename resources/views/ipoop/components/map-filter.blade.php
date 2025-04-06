@@ -59,17 +59,28 @@
       });
     }
 
+    function getSelectedType() {
+        const pub = filterForm.public.checked;
+        const priv = filterForm.private.checked;
+        if (pub && !priv) return 'public';
+        if (!pub && priv) return 'private';
+        return ''; // ambos
+    }
+
     if (filterForm) {
       filterForm.addEventListener('submit', (e) => {
         e.preventDefault();
 
         const filters = {
-          accessible: filterForm.accessible.checked,
-          public: filterForm.public.checked,
-          private: filterForm.private.checked
+            accessible: filterForm.accessible.checked ? 1 : '',
+            type: getSelectedType(),
         };
+        window.iPoop.map.filters = filters;
+        console.log('Filtros aplicados:', [filters, window.iPoop.map.lastPosition]);
 
-        console.log('Filtros aplicados:', filters);
+        // Request updated data.
+        const { lat, lng } = window.iPoop.map.lastPosition;
+        window.iPoop.map.fetchNearbyRestrooms(lat, lng);
 
         filterPanel.classList.remove('translate-x-0');
         filterPanel.classList.add('translate-x-full');

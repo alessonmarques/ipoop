@@ -27,7 +27,7 @@ class Restroom extends Model
 
     public function reviews()
     {
-        return $this->hasMany(Review::class);
+        return $this->hasMany(Review::class)->with('user');
     }
 
     public function photos()

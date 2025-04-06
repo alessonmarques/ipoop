@@ -8,6 +8,10 @@ const ZOOM_TYPE = {
 const IPoopMap = {
   map: null,
   bathrooms: [],
+  userMarker: null,
+  lastPosition: { lat: null, lng: null },
+  filters: {},
+  markers: [],
   icons: {},
 
   initMap(containerId = 'map', defaultCoords = [-22.875226309, -43.4648756], defaultZoom = ZOOM_TYPE.NEIGHBORHOOD) {
@@ -17,6 +21,7 @@ const IPoopMap = {
     this.map = window.map = L.map(containerId).setView(defaultCoords, defaultZoom);
     this.addTileLayer();
     this.locateUser();
+
   },
 
   addTileLayer() {
@@ -31,9 +36,12 @@ const IPoopMap = {
         (position) => {
           const userLat = position.coords.latitude;
           const userLng = position.coords.longitude;
+          // Store the user's last position
+          this.lastPosition = { lat: userLat, lng: userLng };
 
           // Load nearby bathrooms
-          this.setNearBathroomsMocked();
+          this.fetchNearbyRestrooms(userLat, userLng);
+          this.watchUserLocation();
 
           // Move the map to the user's location
           this.map.flyTo([userLat, userLng], ZOOM_TYPE.STREET);
@@ -67,7 +75,7 @@ const IPoopMap = {
     return marker;
   },
 
-  addComplexMarker({ lat, lng, title, rating, comment, imageUrl, detailsUrl, isPublic, isAccessible }) {
+  addComplexMarker({ lat, lng, title, rating, comment, imageUrl, detailsUrl, cost, isPublic, isAccessible }) {
     if (!this.map) {
         console.error("O mapa ainda não foi inicializado.");
         return;
@@ -76,11 +84,14 @@ const IPoopMap = {
     const accessibilityInfo = isAccessible ? "Acessível" : "Não acessível";
     const publicInfo = isPublic ? "Público" : "Privado";
 
+    const formattedCost = cost ? `R$ ${cost.toFixed(2).replace('.', ',')}` : 'Gratuito';
+    const truncatedComment = comment.length > 100 ? comment.substring(0, 50) + '...' : comment;
     const popupHtml = `
         <div style="max-width: 250px;" class="text-sm">
             <h4 class="font-bold mb-1">${title}</h4>
             <p class="text-yellow-500 mb-1">${'⭐'.repeat(rating)}${'☆'.repeat(5 - rating)}</p>
-            <p class="text-gray-700 mb-2"><em>${comment}</em></p>
+            <p class="text-gray-700 mb-2"><em>${truncatedComment}</em></p>
+            <p class="text-gray-600 mb-1"><strong>Custo:</strong> ${formattedCost}</p>
             ${imageUrl ? `<img src="${imageUrl}" class="w-full rounded mb-2" alt="Foto do banheiro">` : ''}
             <p class="text-gray-600 mb-1"><strong>Tipo:</strong> ${publicInfo}</p>
             <p class="text-gray-600 mb-2"><strong>Acessibilidade:</strong> ${accessibilityInfo}</p>
@@ -96,34 +107,57 @@ const IPoopMap = {
     return marker;
   },
 
-  setNearBathrooms() {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const userLat = position.coords.latitude;
-        const userLng = position.coords.longitude;
+  setFilters(filters) {
+    this.filters = filters;
+  },
 
-        fetch('/api/bathrooms/nearby', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ latitude: userLat, longitude: userLng }),
-        })
-          .then(response => response.json())
-          .then(data => {
-            this.bathrooms = data;
-            data.forEach(bathroom => {
-              this.addComplexMarker(bathroom);
-            });
-          })
-          .catch(err => {
-            console.error("Erro ao buscar banheiros próximos:", err);
-          });
-      },
-      (err) => {
-        console.warn("Erro ao obter localização:", err.message);
-      }
-    );
+  fetchNearbyRestrooms() {
+    let lat = this.lastPosition.lat;
+    let lng = this.lastPosition.lng;
+    let accessible = this.filters.accessible ?? '';
+    let type = this.filters.type ?? '';
+
+    const params = new URLSearchParams({lat, lng, accessible, type,});
+    fetch(`/api/restrooms/nearby?${params.toString()}`)
+      .then(response => response.json())
+      .then(data => {
+        this.markers.forEach(m => this.map.removeLayer(m));
+        this.markers = [];
+
+        data.forEach(restroom => {
+            const { lat, lng, title, rating, comment, imageUrl, detailsUrl, isPublic, isAccessible } = restroom;
+            const marker = this.addComplexMarker({ lat, lng, title, rating, comment, imageUrl, detailsUrl, isPublic, isAccessible });
+            this.markers.push(marker);
+        });
+      });
+  },
+
+  watchUserLocation() {
+    setInterval(() => {
+      navigator.geolocation.getCurrentPosition(position => {
+        const newLat = position.coords.latitude;
+        const newLng = position.coords.longitude;
+
+        const distanceMoved = this._calculateDistance(this.lastPosition.lat, this.lastPosition.lng, newLat, newLng);
+        if (distanceMoved > 0.1) {
+          this.lastPosition = { lat: newLat, lng: newLng };
+          this.userMarker.setLatLng([newLat, newLng]);
+          this.fetchNearbyRestrooms(newLat, newLng);
+        }
+      });
+    }, 10000);
+  },
+
+  _calculateDistance(lat1, lon1, lat2, lon2) {
+    const toRad = (val) => val * Math.PI / 180;
+    const R = 6371;
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
   },
 
   setClickMarker(marker, callback) {
@@ -133,94 +167,7 @@ const IPoopMap = {
         callback(e.latlng.lat, e.latlng.lng);
     });
     return marker;
-  },
-
-  setNearBathroomsMocked() {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const userLat = position.coords.latitude;
-        const userLng = position.coords.longitude;
-
-        const data = [
-          {
-            lat: userLat,
-            lng: userLng,
-            title: "Banheiro do Zé",
-            rating: 4,
-            comment: "Muito bom, recomendo!",
-            imageUrl: "https://via.placeholder.com/250",
-            detailsUrl: "#",
-            isPublic: 0,
-            isAccessible: 1,
-          },
-          {
-            lat: userLat + 0.0001,
-            lng: userLng + 0.0001,
-            title: "Banheiro da Maria",
-            rating: 3,
-            comment: "Poderia ser melhor.",
-            imageUrl: "https://via.placeholder.com/250",
-            detailsUrl: "#",
-            isPublic: 1,
-            isAccessible: 0,
-          },
-          {
-            lat: userLat - 0.0004,
-            lng: userLng - 0.0009,
-            title: "Banheiro do João",
-            rating: 5,
-            comment: "Perfeito!",
-            imageUrl: "https://via.placeholder.com/250",
-            detailsUrl: "#",
-            isPublic: 0,
-            isAccessible: 1,
-          },
-          {
-            lat: userLat + 0.0007,
-            lng: userLng - 0.0003,
-            title: "Banheiro do Pedro",
-            rating: 2,
-            comment: "Precisa de melhorias.",
-            imageUrl: "https://via.placeholder.com/250",
-            detailsUrl: "#",
-            isPublic: 1,
-            isAccessible: 0,
-          },
-          {
-            lat: userLat - 0.0005,
-            lng: userLng - 0.0002,
-            title: "Banheiro da Ana",
-            rating: 5,
-            comment: "Excelente, super limpo!",
-            imageUrl: "https://via.placeholder.com/250",
-            detailsUrl: "#",
-            isPublic: 0,
-            isAccessible: 1,
-          },
-          {
-            lat: userLat + 0.0003,
-            lng: userLng - 0.0001,
-            title: "Banheiro do Carlos",
-            rating: 3,
-            comment: "Bom, mas pode melhorar.",
-            imageUrl: "https://via.placeholder.com/250",
-            detailsUrl: "#",
-            isPublic: 1,
-            isAccessible: 1,
-          }
-        ];
-
-        data.forEach(bathroom => {
-          this.addComplexMarker(bathroom);
-        });
-      },
-      (err) => {
-        console.warn("Erro ao obter localização:", err.message);
-      }
-    );
   }
-
-
 
 };
 

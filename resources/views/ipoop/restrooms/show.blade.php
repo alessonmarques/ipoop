@@ -6,10 +6,16 @@
   </x-slot>
 
   <div class="px-4 py-6 max-w-4xl mx-auto space-y-4">
+
     <div class="flex justify-between items-center">
-        <a href="{{ route('admin.restrooms.index') }}" class="text-purple-600 hover:underline">← Voltar</a>
+        <div class="mb-2">
+            <a href="{{ url()->previous() }}" class="text-purple-600 hover:underline text-sm">
+                ← Voltar
+            </a>
+        </div>
         <x-report-button :restroom="$restroom" />
     </div>
+
 
     <div class="mt-6 flex flex-col lg:flex-row gap-6 items-start">
         <!-- Informações -->

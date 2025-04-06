@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\Restroom;
+use App\Models\Review;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,6 +13,24 @@ use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
+    public function index()
+    {
+        $user = Auth::user();
+        return view('ipoop.profile.index', compact('user'));
+    }
+
+    public function restrooms()
+    {
+        $restrooms = Restroom::where('user_id', Auth::id())->get();
+        return view('ipoop.profile.restrooms', compact('restrooms'));
+    }
+
+    public function reviews()
+    {
+        $reviews = Review::with('restroom')->where('user_id', Auth::id())->get();
+        return view('ipoop.profile.reviews', compact('reviews'));
+    }
+
     /**
      * Display the user's profile form.
      */

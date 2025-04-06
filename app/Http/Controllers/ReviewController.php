@@ -35,4 +35,29 @@ class ReviewController extends Controller
         return back()->with('success', 'Avaliação enviada com sucesso!');
     }
 
+    public function edit(Review $review)
+    {
+        if ($review->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        return view('ipoop.profile.edit-review', compact('review'));
+    }
+
+    public function update(Request $request, Review $review)
+    {
+        if ($review->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'comment' => 'nullable|string|max:1000',
+        ]);
+
+        $review->update($validated);
+
+        return redirect()->route('profile.reviews')->with('success', 'Avaliação atualizada com sucesso!');
+    }
+
 }

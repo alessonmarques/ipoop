@@ -9,6 +9,17 @@
               <img src="{{ asset('storage/' . $photo->path) }}"
                    alt="Foto do banheiro"
                    class="w-full h-[500px] object-contain rounded">
+              @if(auth()->check() && auth()->user()->type === 'admin')
+                <form action="{{ route('admin.photos.destroy', $photo) }}" method="POST"
+                    onsubmit="return confirm('Deseja realmente excluir esta foto?');"
+                    class="absolute top-2 right-2 bg-white bg-opacity-80 rounded-full shadow">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="text-red-600 hover:text-red-800 px-2 py-1 text-lg font-bold">
+                    &times;
+                </button>
+                </form>
+              @endif
             </div>
           @endforeach
         </div>
