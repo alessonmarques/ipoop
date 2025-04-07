@@ -7,6 +7,12 @@
 
   <div class="px-4 py-6 max-w-7xl mx-auto">
 
+    <div class="mb-4">
+        <a href="{{ route('profile') }}" class="inline-flex items-center text-sm font-medium text-purple-600 hover:text-purple-800">
+            ← Voltar
+        </a>
+    </div>
+
     <div class="mb-6 flex gap-4">
       <a href="{{ route('admin.restrooms.index') }}"
         class="px-4 py-2 rounded

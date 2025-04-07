@@ -12,11 +12,22 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <!--
-                        <x-nav-link :href="route('home')" :active="request()->routeIs('home')">
-                            {{ __('Home') }}
+                    <x-nav-link :href="route('home')" :active="request()->routeIs('home')">
+                        {{ __('Home') }}
+                    </x-nav-link>
+                    @if (Auth::check())
+                        <x-nav-link :href="route('profile')" :active="request()->routeIs('profile')">
+                            {{ __('Profile') }}
                         </x-nav-link>
-                    -->
+                        @if(Auth::user()->type == 'admin')
+                            <x-nav-link :href="route('admin.restrooms.index')" :active="request()->routeIs('admin.restrooms.index')">
+                                {{ __('Restrooms') }}
+                            </x-nav-link>
+                            <x-nav-link :href="route('admin.reports.index')" :active="request()->routeIs('admin.reports.index')">
+                                {{ __('Reports') }}
+                            </x-nav-link>
+                        @endif
+                    @endif
                 </div>
             </div>
 
@@ -98,25 +109,38 @@
 
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
-        <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('home')" :active="request()->routeIs('home')">
-                {{ __('Home') }}
-            </x-responsive-nav-link>
-        </div>
-
-        <!-- Responsive Settings Options -->
-        @auth
-            <div class="pt-4 pb-1 border-t border-gray-200">
+        <div class="pt-4 pb-1 border-t border-gray-200">
+            @auth
                 <div class="px-4">
                     <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
                     <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
                 </div>
+            @endauth
 
-                <div class="mt-3 space-y-1">
-                    <x-responsive-nav-link :href="route('profile.edit')">
+            <div class="space-y-1">
+                <x-responsive-nav-link :href="route('home')" :active="request()->routeIs('home')">
+                    {{ __('Home') }}
+                </x-responsive-nav-link>
+                @guest
+                    <x-responsive-nav-link :href="route('login')" :active="request()->routeIs('login')">
+                        {{ __('Login') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('register')" :active="request()->routeIs('register')">
+                        {{ __('Register') }}
+                    </x-responsive-nav-link>
+                @endguest
+                @auth
+                    <x-responsive-nav-link :href="route('profile')">
                         {{ __('Profile') }}
                     </x-responsive-nav-link>
-
+                    @if(Auth::user()->type == 'admin')
+                        <x-responsive-nav-link :href="route('admin.restrooms.index')" :active="request()->routeIs('admin.restrooms.index')">
+                            {{ __('Restrooms') }}
+                        </x-responsive-nav-link>
+                        <x-responsive-nav-link :href="route('admin.reports.index')" :active="request()->routeIs('admin.reports.index')">
+                            {{ __('Reports') }}
+                        </x-responsive-nav-link>
+                    @endif
                     <!-- Authentication -->
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
@@ -126,8 +150,8 @@
                             {{ __('Log Out') }}
                         </x-responsive-nav-link>
                     </form>
-                </div>
+                @endauth
             </div>
-        @endauth
+        </div>
     </div>
 </nav>
