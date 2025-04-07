@@ -1,6 +1,6 @@
 # 🚽 IPoop – Sistema Web de Avaliação e Ranqueamento de Banheiros Públicos
 
-[![Laravel](https://img.shields.io/badge/Laravel-10.x-red?style=flat&logo=laravel)](https://laravel.com)
+[![Laravel](https://img.shields.io/badge/Laravel-12.x-red?style=flat&logo=laravel)](https://laravel.com)
 [![Livewire](https://img.shields.io/badge/Livewire-3.x-blue?style=flat)](https://livewire.laravel.com)
 [![Leaflet.js](https://img.shields.io/badge/Leaflet.js-Map-green?style=flat)](https://leafletjs.com)
 [![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-3.x-blueviolet?style=flat&logo=tailwind-css)](https://tailwindcss.com)
