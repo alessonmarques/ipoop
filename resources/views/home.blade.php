@@ -1,7 +1,7 @@
 <x-app-layout>
 
     <div class="flex flex-col h-[90vh] relative" style="z-index: 1;">
-        <a href="{{ auth()->check() ? '/restrooms/create' : '#' }}"
+        <a href="{{ auth()->check() ? route('restrooms.create') : '#' }}"
             id="addRestroomBtn"
             class="absolute bottom-12 right-6 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-5 rounded shadow-lg z-[10000]">
             + Adicionar Banheiro
@@ -57,7 +57,7 @@
 
         <div class="mt-12 text-center">
             <a  id="addRestroomBtnCenter"
-                href="{{ auth()->check() ? '/restrooms/create' : '#' }}"
+                href="{{ auth()->check() ? route('restrooms.create') : '#' }}"
                 class="inline-block bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded text-lg shadow">
                 Cadastre seu primeiro banheiro
             </a>
