@@ -1,6 +1,6 @@
 <x-app-layout>
 
-    <div class="flex flex-col h-[90vh] relative" style="z-index: 1;">
+    <div class="flex flex-col h-[85vh] relative" style="z-index: 1;">
         <a href="{{ auth()->check() ? route('restrooms.create') : '#' }}"
             id="addRestroomBtn"
             class="absolute bottom-12 right-6 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-5 rounded shadow-lg z-[10000]">
