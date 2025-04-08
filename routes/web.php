@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminReportController;
 use App\Http\Controllers\AdminRestroomController;
+use App\Http\Controllers\DeployController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\ProfileController;
@@ -48,5 +49,11 @@ Route::middleware(['auth', 'checkUserType:admin'])
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/restrooms/{restroom}', [RestroomController::class, 'show'])->name('restrooms.show');
+
+Route::post('/deploy', DeployController::class);
+
+Route::get('/termos' , function () {
+    return view('documents.terms');
+})->name('terms');
 
 require __DIR__.'/auth.php';
