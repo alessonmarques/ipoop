@@ -3,4 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\RestroomController;
 
-Route::get('/restrooms/nearby', [RestroomController::class, 'nearby']);
+Route::middleware('throttle:5,1')->group(function () {
+    Route::get('/restrooms/nearby', [RestroomController::class, 'nearby']);
+});
