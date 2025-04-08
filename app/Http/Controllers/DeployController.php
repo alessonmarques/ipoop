@@ -26,6 +26,10 @@ class DeployController extends Controller
             abort(401, 'Invalid signature.');
         }
 
+        if (Cache::has('deploy_trigger')) {
+            Log::info('Deploy: already triggered.');
+            return response()->json(['message' => 'Deploy already triggered.'], 200);
+        }
         Cache::put('deploy_trigger', true, now()->addMinutes(2));
 
         Log::info('Deploy: successfully completed.');
