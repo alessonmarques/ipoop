@@ -12,6 +12,7 @@ class DeployController extends Controller
         $providedSecret = $request->header(key: 'X-Hub-Signature-256') ?? '';
         $expectedSecret = env('GITHUB_WEBHOOK_SECRET');
 
+        // Verifica se o cabeçalho X-Hub-Signature-256 está presente
         if (!$expectedSecret || !$this->isValidSignature($request->getContent(), $providedSecret, $expectedSecret)) {
             Log::warning('Deploy: Assinatura inválida ou não fornecida.');
             return response('Unauthorized', 401);
