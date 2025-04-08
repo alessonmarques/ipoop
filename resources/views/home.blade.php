@@ -50,10 +50,12 @@
             </ol>
         </div>
 
-        <div class="mt-12">
-            <h3 class="text-xl font-semibold text-purple-700 mb-4">Depoimentos recentes</h3>
-            @include('ipoop.components.testimonials')
-        </div>
+        @if ($testimonials->isNotEmpty())
+            <div class="mt-12">
+                <h3 class="text-xl font-semibold text-purple-700 mb-4">Depoimentos recentes</h3>
+                @include('ipoop.components.testimonials')
+            </div>
+        @endif
 
         <div class="mt-12 text-center">
             <a  id="addRestroomBtnCenter"
