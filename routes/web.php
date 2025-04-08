@@ -50,7 +50,13 @@ Route::middleware(['auth', 'checkUserType:admin'])
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/restrooms/{restroom}', [RestroomController::class, 'show'])->name('restrooms.show');
 
-Route::post('/deploy', DeployController::class);
+Route::post('/deploy', DeployController::class)
+    ->withoutMiddleware([
+        \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
+        \Illuminate\Auth\Middleware\Authenticate::class,
+    ])
+    ->name('deploy')
+    ->middleware('throttle:10,1');
 
 Route::get('/termos' , function () {
     return view('documents.terms');
