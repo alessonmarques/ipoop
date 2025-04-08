@@ -2,41 +2,34 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
-use Symfony\Component\Process\Process;
 
 class DeployController extends Controller
 {
     public function __invoke(Request $request)
     {
-        $providedSecret = $request->header(key: 'X-Hub-Signature-256') ?? '';
-        $expectedSecret = env('GITHUB_WEBHOOK_SECRET');
+        $secret = env('GITHUB_WEBHOOK_SECRET');
 
-        // Verifica se o cabeçalho X-Hub-Signature-256 está presente
-        if (!$expectedSecret || !$this->isValidSignature($request->getContent(), $providedSecret, $expectedSecret)) {
-            Log::warning('Deploy: Assinatura inválida ou não fornecida.');
-            return response('Unauthorized', 401);
+        $signature = $request->header('X-Hub-Signature-256') ?? $request->header('X-Hub-Signature');
+
+        if (!$signature) {
+            abort(401, 'Missing signature.');
         }
 
-        // Log de início
-        Log::info('Deploy: Webhook recebido, iniciando deploy...');
+        $hashAlgo = str_contains($signature, 'sha256=') ? 'sha256' : 'sha1';
+        $payload = $request->getContent();
+        $expected = hash_hmac($hashAlgo, $payload, $secret);
+        $provided = explode('=', $signature, 2)[1] ?? '';
 
-        // Rodar o deploy script
-        $process = Process::fromShellCommandline(base_path('deploy.sh'));
-        $process->run();
-
-        if (! $process->isSuccessful()) {
-            Log::error('Deploy: erro ao executar script', ['output' => $process->getErrorOutput()]);
-            return response('Erro ao executar deploy', 500);
+        if (!hash_equals($expected, $provided)) {
+            abort(401, 'Invalid signature.');
         }
 
-        Log::info('Deploy: concluído com sucesso.');
-        return response('Deploy executado com sucesso');
+        Cache::put('deploy_trigger', true, now()->addMinutes(2));
+
+        Log::info('Deploy: successfully completed.');
+        return response()->json(['message' => 'Deploy authorized.'], 200);
     }
 
-    private function isValidSignature($payload, $provided, $secret)
-    {
-        $hash = 'sha256=' . hash_hmac('sha256', $payload, $secret);
-        return hash_equals($hash, $provided);
-    }
 }
