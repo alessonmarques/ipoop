@@ -3,6 +3,7 @@
     <head>
         <!-- Required meta tags -->
         @include('layouts.meta')
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     </head>
     <body class="font-sans text-gray-900 antialiased">
         <div class="min-h-screen bg-gray-100">
