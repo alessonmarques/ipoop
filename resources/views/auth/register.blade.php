@@ -2,6 +2,15 @@
     <form method="POST" action="{{ route('register') }}">
         @csrf
 
+        @if ($errors->has('g-recaptcha-response'))
+            <div class="flex justify-center">
+                <span class="text-red-600 text-sm my-2">
+                    {{ $errors->first('g-recaptcha-response') }}
+                </span>
+            </div>
+        @endif
+
+
         <!-- Name -->
         <div>
             <x-input-label for="name" :value="__('Name')" />
@@ -47,6 +56,9 @@
             <x-primary-button class="ms-4">
                 {{ __('Register') }}
             </x-primary-button>
+        </div>
+        <div class="flex justify-center mt-2">
+            <div class="g-recaptcha" data-sitekey="{{ env('RECAPTCHA_SITE_KEY') }}"></div>
         </div>
     </form>
 </x-guest-layout>

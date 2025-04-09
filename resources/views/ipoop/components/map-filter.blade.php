@@ -76,7 +76,6 @@
             type: getSelectedType(),
         };
         window.iPoop.map.filters = filters;
-        console.log('Filtros aplicados:', [filters, window.iPoop.map.lastPosition]);
 
         // Request updated data.
         const { lat, lng } = window.iPoop.map.lastPosition;
