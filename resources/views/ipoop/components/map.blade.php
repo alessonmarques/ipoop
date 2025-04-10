@@ -1,6 +1,6 @@
 <button
   id="recenterButton"
-  class="absolute bottom-12 left-4 z-[10050] bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded shadow-md text-sm"
+  class="absolute bottom-12 left-4 z-[10050] bg-purple-600 hover:bg-purple-700 text-white py-3 px-5 rounded shadow-md text-sm"
   onclick="window.iPoop.map.recenterUser()"
 >
   📍
