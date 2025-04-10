@@ -41,17 +41,18 @@ const IPoopMap = {
 
           // Load nearby bathrooms
           this.fetchNearbyRestrooms(userLat, userLng);
-          this.watchUserLocation();
 
           // Move the map to the user's location
           this.map.flyTo([userLat, userLng], ZOOM_TYPE.STREET);
 
-          L.marker([userLat, userLng])
+          this.userMarker = L.marker([userLat, userLng])
             .addTo(this.map)
             .bindPopup("Você está aqui!")
             .openPopup();
-        },
-        (err) => {
+
+            this.watchUserLocation();
+          },
+          (err) => {
           console.warn("Erro ao obter localização:", err.message);
         }
       );
@@ -71,6 +72,23 @@ const IPoopMap = {
     if (popupText) {
       marker.bindPopup(popupText);
     }
+
+    return marker;
+  },
+
+  addOffCanvasMarker(lat, lng, restroom) {
+    if (!this.map) {
+      console.error("O mapa ainda não foi inicializado.");
+      return;
+    }
+
+    const marker = L.marker([lat, lng], {
+      icon: this.icons.getRestroomIcon(restroom.isPublic, restroom.isAccessible, restroom.rating)
+    }).addTo(this.map);
+
+    marker.on('click', () => {
+      this.openBottomSheet(restroom);
+    });
 
     return marker;
   },
@@ -117,19 +135,35 @@ const IPoopMap = {
     let accessible = this.filters.accessible ?? '';
     let type = this.filters.type ?? '';
 
-    const params = new URLSearchParams({lat, lng, accessible, type,});
+    const params = new URLSearchParams({lat, lng, accessible, type});
     fetch(`/api/restrooms/nearby?${params.toString()}`)
-      .then(response => response.json())
-      .then(data => {
-        this.markers.forEach(m => this.map.removeLayer(m));
-        this.markers = [];
+    .then(response => {
+      if (response.status === 429) {
+        console.warn('⏳ esperando próxima chance de request');
+        return null;
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (!data) return; // skip 429
 
-        data.forEach(restroom => {
-            const { lat, lng, title, rating, comment, imageUrl, detailsUrl, isPublic, isAccessible } = restroom;
-            const marker = this.addComplexMarker({ lat, lng, title, rating, comment, imageUrl, detailsUrl, isPublic, isAccessible });
-            this.markers.push(marker);
-        });
+      // Clear previous markers
+      this.restrooms = [];
+
+      // Remove existing markers from the map
+      this.markers.forEach(m => this.map.removeLayer(m));
+      this.markers = [];
+
+      // Add new markers
+      data.forEach(restroom => {
+        this.restrooms.push(restroom);
+        const marker = this.addOffCanvasMarker(restroom.lat, restroom.lng, restroom);
+        this.markers.push(marker);
       });
+    })
+    .catch(error => {
+      console.error('Erro ao buscar banheiros próximos:', error);
+    });
   },
 
   watchUserLocation() {
@@ -137,27 +171,32 @@ const IPoopMap = {
       navigator.geolocation.getCurrentPosition(position => {
         const newLat = position.coords.latitude;
         const newLng = position.coords.longitude;
-
-        const distanceMoved = this._calculateDistance(this.lastPosition.lat, this.lastPosition.lng, newLat, newLng);
-        if (distanceMoved > 0.01) {
+        // Check if the user has moved significantly
+        let distanceMoved = this._calculateDistance(this.lastPosition.lat, this.lastPosition.lng, newLat, newLng);
+        distanceMoved = 1;
+        if (distanceMoved >= 0.1) { // 100 meters
+          // Update the user's last position
           this.lastPosition = { lat: newLat, lng: newLng };
+          // Update the marker position
           this.userMarker.setLatLng([newLat, newLng]);
+          // Fetch nearby restrooms again
           this.fetchNearbyRestrooms(newLat, newLng);
         }
       });
-    }, 10000);
+    }, 15000);
   },
 
-  _calculateDistance(lat1, lon1, lat2, lon2) {
+  _calculateDistance(lat1, lon1, lat2, lon2, unit = 'km') {
     const toRad = (val) => val * Math.PI / 180;
-    const R = 6371;
+    const R = 6371; // raio da Terra em km
     const dLat = toRad(lat2 - lat1);
     const dLon = toRad(lon2 - lon1);
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+    const a = Math.sin(dLat/2) ** 2 +
               Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-              Math.sin(dLon/2) * Math.sin(dLon/2);
+              Math.sin(dLon/2) ** 2;
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
+    const d = R * c;
+    return unit === 'm' ? d * 1000 : d;
   },
 
   setClickMarker(marker, callback) {
@@ -167,8 +206,144 @@ const IPoopMap = {
         callback(e.latlng.lat, e.latlng.lng);
     });
     return marker;
-  }
+  },
 
+  openBottomSheet(restroom) {
+    this.closeBottomSheet();
+
+    const bottomSheet = document.getElementById('bathroomBottomSheet');
+    const backDrop = document.getElementById('bottomSheetBackdrop');
+    if (!bottomSheet) {
+      console.error("Bottom sheet element not found.");
+      return;
+    }
+
+    const bottomSheetHeader = document.getElementById('bottomSheetHeader');
+    const title = document.getElementById('bottomSheetTitle');
+    const accessibilityInfo = document.getElementById('accessibilityInfo');
+    const commentList = document.getElementById('commentList');
+    const restroomMeta = document.getElementById('restroomMeta');
+    const detailsLink = document.getElementById('detailsLink');
+
+    const wrapper = document.getElementById('swiperWrapper');
+    if (!wrapper) {
+      console.error("Swiper wrapper element not found.");
+      return;
+    }
+
+    // Clear previous
+    accessibilityInfo.innerHTML = '';
+    commentList.innerHTML = '';
+    restroomMeta.innerHTML = '';
+    detailsLink.innerHTML = '';
+    wrapper.innerHTML = '';
+
+    // Title
+    title.innerText = restroom.title ?? "Bathroom Details";
+
+    if (restroom.imageUrls && restroom.imageUrls.length > 0) {
+      let list = restroom.imageUrls.map(url => `
+        <div class="swiper-slide">
+          <img src="${url}" class="w-full h-48 object-cover" />
+        </div>
+      `).join('');
+      // If there's only 1 image insert two of it.
+      if (restroom.imageUrls.length === 1) {
+        list += list;
+      }
+      wrapper.innerHTML = list;
+    } else {
+      wrapper.innerHTML = `
+        <div class="swiper-slide flex items-center justify-center text-gray-400 bg-gray-100">
+          No image available
+        </div>
+      `;
+    }
+
+    // Instanciar o swiper (após preencher o DOM)
+    new Swiper('#imageCarousel', {
+      loop: true,
+      pagination: {
+        el: '.swiper-pagination',
+      },
+    });
+
+    // Accessibility
+    accessibilityInfo.innerHTML = restroom.isAccessible
+      ? '♿ Este banheiro é acessível.'
+      : '⚠️ Este banheiro não está marcado como acessível.';
+
+
+    // Reset classes
+    bottomSheetHeader.classList.remove('bg-purple-700', 'bg-blue-700');
+    if (restroom.isPublic) {
+      bottomSheetHeader.classList.add('bg-blue-700');
+    } else {
+      bottomSheetHeader.classList.add('bg-purple-700');
+    }
+
+    // Rating, Public, Cost
+    restroomMeta.innerHTML = `
+      <p>⭐ Avaliação: ${restroom.rating == 0 && restroom.comments.length > 0 ? restroom.rating : 'Não Avaliado'} / 5</p>
+      <p>💸 Custo: ${restroom.cost === "0.00" ? "Gratuito" : `R$ ${restroom.cost}`}</p>
+      <p>${restroom.isPublic ? '🌐 Público' : '🔒 Privado'}</p>
+    `;
+    if (this.userMarker) {
+      const userLatLng = this.userMarker.getLatLng();
+      const distance = this._calculateDistance(userLatLng.lat, userLatLng.lng, restroom.lat, restroom.lng, 'm');
+
+      const formattedDistance = distance < 1000
+        ? `${Math.round(distance)} m`
+        : `${(distance / 1000).toFixed(1)} km`;
+
+      restroomMeta.innerHTML += `<p>📍 Aproximadamente ${formattedDistance} de distância</p>`;
+    }
+    // More details link
+    if (restroom.detailsUrl) {
+      detailsLink.innerHTML = `
+        <a href="${restroom.detailsUrl}"
+           class="inline-block mt-2 text-purple-600 hover:underline text-sm font-medium">
+           🔍 Ver detalhes
+        </a>
+      `;
+    }
+
+    // Comments
+    if (restroom.comments && restroom.comments.length > 0) {
+      commentList.innerHTML = restroom.comments.map(comment => `
+        <div class="p-3 bg-gray-100 rounded shadow-sm">
+          <div class="flex justify-between items-center mb-1">
+            <p class="text-sm font-medium text-purple-700">${comment.user}</p>
+            <p class="text-sm text-yellow-500 font-semibold">⭐ ${comment.rating ?? '—'}</p>
+          </div>
+          <p class="text-sm text-gray-700">${comment.comment ?? 'Nenhum comentário fornecido.'}</p>
+        </div>
+      `).join('');
+    } else {
+      commentList.innerHTML = '<p class="text-sm text-gray-500">Nenhum comentário disponível.</p>';
+    }
+
+    bottomSheet.classList.remove('translate-y-full');
+    backDrop.classList.remove('hidden');
+  },
+
+  recenterUser() {
+    if (this.userMarker) {
+      const latlng = this.userMarker.getLatLng();
+      this.map.setView(latlng, ZOOM_TYPE.NEIGHBORHOOD);
+    } else {
+      console.warn("Localização do usuário ainda não disponível.");
+    }
+  },
+
+  closeBottomSheet() {
+    const bottomSheet = document.getElementById("bathroomBottomSheet");
+    const backDrop = document.getElementById("bottomSheetBackdrop");
+    if (bottomSheet) {
+      bottomSheet.classList.add("translate-y-full");
+      backDrop.classList.add("hidden");
+    }
+  }
 };
 
 export default IPoopMap;

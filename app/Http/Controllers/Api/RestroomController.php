@@ -20,7 +20,7 @@ class RestroomController extends Controller
 
         $lat = $request->lat;
         $lng = $request->lng;
-        $radius = 2; // km
+        $radius = $request->query('radius', 30); // km
 
         $restrooms = Restroom::with(['photos', 'reviews.user'])
             ->selectRaw("*,
