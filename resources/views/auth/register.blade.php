@@ -56,5 +56,8 @@
                 {{ __('Registrar') }}
             </x-primary-button>
         </div>
+        <div class="flex justify-center mt-2">
+            <div class="g-recaptcha" data-sitekey="{{ env('RECAPTCHA_SITE_KEY') }}"></div>
+        </div>
     </form>
 </x-guest-layout>
