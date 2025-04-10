@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Password;
 use Illuminate\View\View;
 
@@ -25,6 +26,25 @@ class PasswordResetLinkController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        // se o reCAPTCHA for inválido, o Laravel irá automaticamente retornar um erro de validação
+        $request->validate([
+            'g-recaptcha-response' => 'required',
+        ], [
+            'g-recaptcha-response.required' => 'Por favor, marque o reCAPTCHA.',
+        ]);
+
+        $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+            'secret' => env('RECAPTCHA_SECRET_KEY'),
+            'response' => $request->input('g-recaptcha-response'),
+            'remoteip' => $request->ip(),
+        ]);
+
+        if (!($response->json()['success'] ?? false)) {
+            return back()->withErrors([
+                'g-recaptcha-response' => 'Falha ao validar o reCAPTCHA, tente novamente.',
+            ]);
+        }
+
         $request->validate([
             'email' => ['required', 'email'],
         ]);

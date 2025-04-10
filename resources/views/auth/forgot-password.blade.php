@@ -1,24 +1,32 @@
 <x-guest-layout>
     <div class="mb-4 text-sm text-gray-600">
-        {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
+        {{ __('Esqueceu sua senha? Sem problemas. Basta nos informar o seu endereço de e-mail e enviaremos um link para redefinir sua senha, permitindo que você escolha uma nova.') }}
     </div>
 
-    <!-- Session Status -->
+    <!-- Status da Sessão -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
     <form method="POST" action="{{ route('password.email') }}">
         @csrf
 
-        <!-- Email Address -->
+        @if ($errors->has('g-recaptcha-response'))
+            <div class="flex justify-center">
+                <span class="text-red-600 text-sm my-2">
+                    {{ $errors->first('g-recaptcha-response') }}
+                </span>
+            </div>
+        @endif
+
+        <!-- Endereço de E-mail -->
         <div>
-            <x-input-label for="email" :value="__('Email')" />
+            <x-input-label for="email" :value="__('E-mail')" />
             <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
         <div class="flex items-center justify-end mt-4">
             <x-primary-button>
-                {{ __('Email Password Reset Link') }}
+                {{ __('Enviar Link de Redefinição de Senha') }}
             </x-primary-button>
         </div>
     </form>
