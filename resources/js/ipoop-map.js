@@ -1,11 +1,10 @@
 import IPoopMapIcons from './ipoop-map-icons';
 
-const ZOOM_TYPE = {
-  NEIGHBORHOOD: 15,
-  STREET: 18,
-};
-
 const IPoopMap = {
+  ZOOM_TYPE: {
+    NEIGHBORHOOD: 15,
+    STREET: 18,
+  },
   map: null,
   bathrooms: [],
   userMarker: null,
@@ -14,7 +13,7 @@ const IPoopMap = {
   markers: [],
   icons: {},
 
-  initMap(containerId = 'map', defaultCoords = [-22.875226309, -43.4648756], defaultZoom = ZOOM_TYPE.NEIGHBORHOOD) {
+  initMap(containerId = 'map', defaultCoords = [-22.875226309, -43.4648756], defaultZoom = this.ZOOM_TYPE.NEIGHBORHOOD) {
     IPoopMapIcons.setIcons();
     this.icons = IPoopMapIcons;
 
@@ -43,7 +42,7 @@ const IPoopMap = {
           this.fetchNearbyRestrooms(userLat, userLng);
 
           // Move the map to the user's location
-          this.map.flyTo([userLat, userLng], ZOOM_TYPE.STREET);
+          this.map.flyTo([userLat, userLng], this.ZOOM_TYPE.STREET);
 
           this.userMarker = L.marker([userLat, userLng])
             .addTo(this.map)
@@ -329,8 +328,8 @@ const IPoopMap = {
 
   recenterUser() {
     if (this.userMarker) {
-      const latlng = this.userMarker.getLatLng();
-      this.map.setView(latlng, ZOOM_TYPE.NEIGHBORHOOD);
+      const latLng = this.userMarker.getLatLng();
+      this.map.setView(latLng, this.ZOOM_TYPE.STREET);
     } else {
       console.warn("Localização do usuário ainda não disponível.");
     }
