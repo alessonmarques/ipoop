@@ -40,6 +40,10 @@
             </label>
         </div>
 
+        <div class="flex justify-center mt-2">
+            <div class="g-recaptcha" data-sitekey="{{ env('RECAPTCHA_SITE_KEY') }}"></div>
+        </div>
+
         <div class="flex items-center justify-end mt-4">
 
             @if (Route::has('password.request'))
@@ -52,8 +56,6 @@
                 {{ __('Entrar') }}
             </x-primary-button>
         </div>
-        <div class="flex justify-center mt-2">
-            <div class="g-recaptcha" data-sitekey="{{ env('RECAPTCHA_SITE_KEY') }}"></div>
-        </div>
+
     </form>
 </x-guest-layout>
