@@ -25,6 +25,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'provider',
         'provider_id',
+        'registered_session_data',
         'type'
     ];
 
@@ -50,7 +51,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     const TYPE_ANONYMOUS = 'anonymous';
     const TYPE_USER = 'user';
-    const TYPE_ADMIN = 'administrator';
+    const TYPE_ADMIN = 'admin';
 
     public function restrooms()
     {
