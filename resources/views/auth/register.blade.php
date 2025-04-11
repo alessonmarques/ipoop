@@ -27,25 +27,34 @@
         <!-- Senha -->
         <div class="mt-4">
             <x-input-label for="password" :value="__('Senha')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="new-password" />
-
+            <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
         <!-- Confirmar Senha -->
         <div class="mt-4">
             <x-input-label for="password_confirmation" :value="__('Confirmar Senha')" />
-
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                            type="password"
-                            name="password_confirmation" required autocomplete="new-password" />
-
+            <x-text-input id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" required autocomplete="new-password" />
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
+
+        <div class="flex justify-center mt-2">
+            <div class="g-recaptcha" data-sitekey="{{ env('RECAPTCHA_SITE_KEY') }}"></div>
+        </div>
+
+        <!-- Aceitar Termos -->
+        <div class="mt-4">
+            <label class="flex items-center">
+                <input type="checkbox" name="terms" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" required>
+                <span class="ms-2 text-sm text-gray-600">
+                    {!! __('Eu li e aceito os <a href=":url" class="underline text-indigo-600 hover:text-indigo-900" target="_blank">Termos de Uso</a>', ['url' => route('terms')]) !!}
+                </span>
+            </label>
+            @if ($errors->has('terms'))
+                <span class="text-red-600 text-sm mt-1">{{ $errors->first('terms') }}</span>
+            @endif
+        </div>
+
 
         <div class="flex items-center justify-end mt-4">
             <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
@@ -55,9 +64,6 @@
             <x-primary-button class="ms-4">
                 {{ __('Registrar') }}
             </x-primary-button>
-        </div>
-        <div class="flex justify-center mt-2">
-            <div class="g-recaptcha" data-sitekey="{{ env('RECAPTCHA_SITE_KEY') }}"></div>
         </div>
     </form>
 </x-guest-layout>
