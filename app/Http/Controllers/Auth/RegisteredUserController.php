@@ -90,12 +90,13 @@ class RegisteredUserController extends Controller
             ];
         }
 
-        $user = User::create([
+        $userData = [
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'registered_session_data' => $sessionData,
-        ]);
+            'registered_session_data' => json_encode($sessionData),
+        ];
+        $user = User::create($userData);
 
         event(new Registered($user));
 
