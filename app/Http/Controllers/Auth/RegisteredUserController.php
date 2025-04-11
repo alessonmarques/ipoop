@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Helpers\GeoHelper;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
@@ -30,6 +31,13 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        // checa se aceitou os termos
+        if (!$request->input('terms')) {
+            return back()->withErrors([
+                'terms' => 'Você deve aceitar os termos de uso.',
+            ]);
+        }
+
        // se o reCAPTCHA for inválido, o Laravel irá automaticamente retornar um erro de validação
        $request->validate([
             'g-recaptcha-response' => 'required',
@@ -56,10 +64,37 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
+        $ip = $request->ip();
+        $geo = GeoHelper::getLocationFromIP($ip);
+
+        // obtemos a localização do IP
+        $sessionData = [
+            'ip' => $ip,
+            'user_agent' => $request->userAgent(),
+            'registered_at' => now()->toIso8601String(),
+            'locale' => $request->getPreferredLanguage(),
+            'timezone' => date_default_timezone_get(),
+        ];
+        if (isset($geo['reason'])) {
+            $sessionData['location'] = [
+                'error' => $geo['reason'],
+            ];
+        } else {
+            $sessionData['location'] = [
+                'city' => $geo['city'] ?? null,
+                'region' => $geo['region'] ?? null,
+                'country' => $geo['country_name'] ?? null,
+                'latitude' => $geo['latitude'] ?? null,
+                'longitude' => $geo['longitude'] ?? null,
+                'asn' => $geo['asn'] ?? null,
+            ];
+        }
+
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'registered_session_data' => $sessionData,
         ]);
 
         event(new Registered($user));
