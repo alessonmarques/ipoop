@@ -31,7 +31,7 @@ Este projeto foi desenvolvido como parte do **Trabalho de Conclusão de Curso (T
 
 ## 🧰 Tecnologias Utilizadas
 
-- **Back-end:** Laravel 10 (PHP 8+)
+- **Back-end:** Laravel 12 (PHP 8+)
 - **Front-end:** Blade, Livewire, Tailwind CSS
 - **Banco de dados:** MySQL
 - **Mapas:** Leaflet.js + HTML Geolocation API
