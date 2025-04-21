@@ -1,15 +1,19 @@
 <x-app-layout>
 
-    <div class="flex flex-col h-[85vh] relative" style="z-index: 1;">
+    {{-- Container do mapa ajustado --}}
+    <div class="flex flex-col relative min-h-[85vh] overflow-hidden" style="z-index: 1;">
+
+        {{-- Botão flutuante com responsividade aprimorada --}}
         <a href="{{ auth()->check() ? route('restrooms.create') : '#' }}"
             id="addRestroomBtn"
-            class="absolute bottom-12 right-6 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-5 rounded shadow-lg z-[10000]">
+            class="absolute bottom-12 right-2 sm:right-6 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 sm:px-5 text-sm sm:text-base rounded shadow-lg z-[10000] w-auto max-w-[90%]">
             + Adicionar Banheiro
         </a>
 
         <x-map-filter />
         <x-map />
 
+        {{-- Botão "Ver mais informações" centralizado responsivamente --}}
         <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 mb-4 z-[10001]">
             <button id="scrollDownBtn"
                 class="flex items-center gap-2 text-purple-700 hover:text-purple-900 font-medium text-sm animate-bounce">
@@ -58,14 +62,15 @@
         @endif
 
         <div class="mt-12 text-center">
-            <a  id="addRestroomBtnCenter"
+            <a id="addRestroomBtnCenter"
                 href="{{ auth()->check() ? route('restrooms.create') : '#' }}"
-                class="inline-block bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded text-lg shadow">
+                class="inline-block bg-purple-600 hover:bg-purple-700 text-white px-4 sm:px-6 py-3 rounded text-base sm:text-lg shadow w-full sm:w-auto max-w-xs mx-auto">
                 Cadastre seu primeiro banheiro
             </a>
         </div>
     </section>
 
+    {{-- Modal de login --}}
     <div id="authPromptModal"
         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[11000] hidden">
         <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm text-center relative">
@@ -111,15 +116,12 @@
         });
 
         window.addEventListener('load', function() {
-            // Initialize the map
             const iPoopMap = window.iPoop.map;
-
             if (document.getElementById('map')) {
                 iPoopMap.initMap();
             }
         });
     </script>
-
     @endpush
 
 </x-app-layout>
